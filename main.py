@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 import os
-
+import re
 
 load_dotenv('token.env')
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -38,8 +38,13 @@ async def reverse_command(message: Message):
     await message.answer(f'{''.join(reversed(message.text.split('/reverse')[1]))}')
 
 
-@dp.message(F.text.lower().in_(['привет', 'здравствуйте', 'ку', 'хай', 'хелло',
-                                'доброе утро', 'добрый день', 'добрый вечер', 'здарова']))
+@dp.message(
+    lambda msg: any(
+        word in re.sub(r'[^\w\s]', '', msg.text.lower())  # Удаляет все знаки препинания
+        for word in ['привет', 'здравствуйте', 'ку', 'хай', 'хелло',
+                     'доброе утро', 'добрый день', 'добрый вечер', 'здарова']
+    )
+)
 async def hello_command(message: Message):
     await message.answer(f'{message.from_user.first_name}, привет!')
 
